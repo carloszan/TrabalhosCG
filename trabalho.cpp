@@ -25,6 +25,12 @@ char texto[30];
 GLfloat win, r, g, b;
 GLint view_w, view_h, primitiva;
 int telaFacil[4][3] = {{1, 1, 2}, {2, 3, 3}, {4, 4, 5}, {5, 6, 6}};
+bool desenhadoFacil[4][3] = {{false, false, false},
+                  {false, false, false},{false, false, false},{false, false, false}};
+// bool desenhadoFacil[4][3] = {{true, true, true},
+// {true, true, true},{true, true, true},{true, true, true}};
+int x0, y0, x1, y1;
+bool  primeiroClique;
 
 void DesenhaQuadrado(GLfloat x, GLfloat y)
 {
@@ -85,56 +91,39 @@ void Randomizar(int linha, int coluna)
 
 void DesenhaTela()
 {
-    // 1 - Quadrado Azul
-    // 2 - Quadrado Vermelho
-    // 3 - Quadrado Verde
-    // 4 - Quadrado Branco
-    // 5 - Triangulo Azul
-    // 6 - Triangulo Vermelho
-    // 7 - Triangulo Verde
-    // 8 - Triangulo Branco
-    // 9 - Losango Azul
-    // 10 - Losango Vermelh
-    // 11 - Losango Verde
-    // 12 - Losango Branco
-
-    Randomizar(4, 3);
-
-    //Randomiza(array, 4, 3);
-
     GLfloat x = -win, y = win; 
     for(int i = 0; i < 4; i++)
     {
         for(int j = 0; j < 3; j++)
         {
-            if(telaFacil[i][j] == 1){
+            if(telaFacil[i][j] == 1 && desenhadoFacil[i][j] == true){
                 // azul
                 glColor3f(0.0f, 0.0f, 1.0f);
                 DesenhaQuadrado(x, y);
             }
-            if(telaFacil[i][j] == 2){
+            if(telaFacil[i][j] == 2 && desenhadoFacil[i][j] == true){
                 // vermelho
                 glColor3f(1.0f, 0.0f, 0.0f);
                 DesenhaQuadrado(x, y);
             }
-            if(telaFacil[i][j] == 3){
+            if(telaFacil[i][j] == 3 && desenhadoFacil[i][j] == true){
                 // verde
                 glColor3f(0.0f, 1.0f, 1.0f);
                 DesenhaQuadrado(x, y);
             }
-            if(telaFacil[i][j] == 4){
-                // branco
-                glColor3f(1.0f, 1.0f, 1.0f);
-                DesenhaQuadrado(x, y);
-            }
-            if(telaFacil[i][j] == 5){
+            if(telaFacil[i][j] == 4 && desenhadoFacil[i][j] == true){
                 // azul
                 glColor3f(0.0f, 0.0f, 1.0f);
                 DesenhaQuadrado(x, y);
             }
-            if(telaFacil[i][j] == 6){
+            if(telaFacil[i][j] == 5 && desenhadoFacil[i][j] == true){
                 // vermelho
                 glColor3f(1.0f, 0.0f, 0.0f);
+                DesenhaQuadrado(x, y);
+            }
+            if(telaFacil[i][j] == 6 && desenhadoFacil[i][j] == true){
+                // verde
+                glColor3f(0.0f, 1.0f, 0.0f);
                 DesenhaQuadrado(x, y);
             }    
             x += 66.7f;
@@ -142,6 +131,42 @@ void DesenhaTela()
         x = -100.0f;
         y -= 50.0f;
     }
+}
+
+void DesenhaObjeto(int x, int y, int i, int j)
+{
+    if(desenhadoFacil[i][j])
+        return;
+    if(telaFacil[i][j] == 1){
+        // azul
+        glColor3f(0.0f, 0.0f, 1.0f);
+        DesenhaQuadrado(x, y);
+    }
+    else if(telaFacil[i][j] == 2){
+        // vermelho
+        glColor3f(1.0f, 0.0f, 0.0f);
+        DesenhaQuadrado(x, y);
+    }
+    else if(telaFacil[i][j] == 3){
+        // verde
+        glColor3f(0.0f, 1.0f, 1.0f);
+        DesenhaQuadrado(x, y);
+    }
+    else if(telaFacil[i][j] == 4){
+        // azul
+        glColor3f(0.0f, 0.0f, 1.0f);
+        DesenhaQuadrado(x, y);
+    }
+    else if(telaFacil[i][j] == 5){
+        // vermelho
+        glColor3f(1.0f, 0.0f, 0.0f);
+        DesenhaQuadrado(x, y);
+    }
+    else if(telaFacil[i][j] == 6){
+        // verde
+        glColor3f(0.0f, 1.0f, 0.0f);
+        DesenhaQuadrado(x, y);
+    } 
 }
 
 // Função callback chamada para fazer o desenho
@@ -153,7 +178,7 @@ void Desenha(void)
     glClear(GL_COLOR_BUFFER_BIT);
 
     // Define a cor corrente
-    glColor3f(r,g,b);
+    //glColor3f(r,g,b);
 
     DesenhaTela();
 
@@ -166,23 +191,17 @@ void Desenha(void)
 
 void ParesFacil()
 {
-    printf("OI");
+    Randomizar(4,3);
 }
 
 void ParesDificil()
-{
-
-}
+{}
 
 void SequenciaFacil()
-{
-
-}
+{}
 
 void SequenciaDificil()
-{
-
-}
+{}
 
 void Sair(int op)
 {
@@ -246,19 +265,41 @@ void CriaMenu()
 }
 
 // Inicializa parâmetros de rendering
-void Inicializa (void)
+void Inicializa(void)
 {   
     // Define a cor de fundo da janela de visualização como branca
-    glClearColor(1.0f, 1.0f, 1.0f, 0.0f);
-    win=100.0f;
-    primitiva = QUADRADO;
-    r = 0.0f;
-    g = 0.0f;
-    b = 1.0f;
-    strcpy(texto, "(0,0)");
-    
+    win = 100.0f;
+    x0 = y0 = x1 = y1 = -1;
+    primeiroClique = true;
+    Randomizar(4,3);
+    DesenhaTela();
     CriaMenu();
     
+}
+
+int TransformaX(int x)
+{
+    return x / (double) 400 * (100 - (-100)) + (-100);
+}
+
+int TransformaY(int y)
+{
+    return (1 - y / (double) 400) * (100 - (-100)) + (-100);
+}
+
+int MapearX(int x)
+{
+    if(x >= 33) return 2;
+    else if(x >= -33) return 1;
+    else return 0;
+}
+
+int MapearY(int y)
+{
+    if(y >= 50) return 0;
+    else if(y >= 0) return 1;
+    else if(y >= -50) return 2;
+    else return 3;
 }
 
 // Função callback chamada quando o tamanho da janela é alterado 
@@ -277,68 +318,55 @@ void AlteraTamanhoJanela(GLsizei w, GLsizei h)
 
 // Função callback chamada sempre que o mouse é movimentado
 // sobre a janela GLUT com um botão pressionado
-void MoveMouseBotaoPressionado(int x, int y)
+void MousePressionado(int x, int y)
 {
-     sprintf(texto, "Botao pressionado (%d,%d)", x, y);
-     //glutPostRedisplay();
-}
+    sprintf(texto, "Botao pressionado (%d,%d)", x, y);
 
-// Função callback chamada sempre que o mouse é movimentado
-// sobre a janela GLUT 
-void MoveMouse(int x, int y)
-{
-     sprintf(texto, "(%d,%d)", x, y);
-     //glutPostRedisplay();
-}
+    //desenhadoFacil[0][0] = true;
+    
+    if(primeiroClique){
+        x0 = TransformaX(x);
+        y0 = TransformaY(y);
+        //DesenhaObjeto();
+        if (desenhadoFacil[MapearX(x0)][MapearY(y0)])
+            desenhadoFacil[MapearX(x0)][MapearY(y0)] = false;
+        primeiroClique = false;        
+    }
+    else{
+        x1 = TransformaX(x);
+        y1 = TransformaY(y);
 
-// Função callback chamada para gerenciar eventos do teclado   
-// para teclas especiais, tais como F1, PgDn e Home
-void TeclasEspeciais(int key, int x, int y)
-{
-    if(key == GLUT_KEY_UP) {
-           win -= 10;
-           if (win < 10) win = 10;
-           glMatrixMode(GL_PROJECTION);
-           glLoadIdentity();
-           gluOrtho2D (-win, win, -win, win);
+        DesenhaObjeto(x1, y1, MapearX(x1), MapearY(y1));
+        x0 = MapearX(x0);
+        y0 = MapearY(y1);
+        x1 = MapearX(x1);
+        y1 = MapearY(y1);
+
+        sprintf(texto, "antigo: (%d, %d), novo: (%d, %d)", x0, y0, x1, y1);
+        if(telaFacil[x0][y0] == telaFacil[x1][y1]){
+            desenhadoFacil[x0][y0] = desenhadoFacil[x1][y1] = true;
+        }
+        primeiroClique = true;
     }
-    if(key == GLUT_KEY_DOWN) {
-           win += 10;
-           if (win > 500) win = 500;
-           glMatrixMode(GL_PROJECTION);
-           glLoadIdentity();
-           gluOrtho2D (-win, win, -win, win);
-    }
-    //glutPostRedisplay();
-}
- 
-/*           
-// Função callback chamada para gerenciar eventos do mouse
-void GerenciaMouse(int button, int state, int x, int y)
-{        
-    if (button == GLUT_RIGHT_BUTTON)
-         if (state == GLUT_DOWN) 
-           glutAttachMenu(GLUT_RIGHT_BUTTON);
-         
+      
     glutPostRedisplay();
 }
-*/
-                     
+
 // Programa Principal 
 int main(int argc, char** argv)
 {
     srand(time(NULL));
     glutInit(&argc, argv);
     glutInitDisplayMode(GLUT_DOUBLE | GLUT_RGB);     
-    glutInitWindowSize(350,300);
+    glutInitWindowSize(400,400);
     glutInitWindowPosition(10,10);
     glutCreateWindow("Trabalho CG");
     glutDisplayFunc(Desenha);
     glutReshapeFunc(AlteraTamanhoJanela);
-    glutMotionFunc(MoveMouseBotaoPressionado); 
-    glutPassiveMotionFunc(MoveMouse);
-//     glutMouseFunc(GerenciaMouse);    
-    glutSpecialFunc(TeclasEspeciais);
+    glutMotionFunc(MousePressionado); 
+    //glutPassiveMotionFunc(MoveMouse);
+    //glutMouseFunc(GerenciaMouse);    
+    //glutSpecialFunc(TeclasEspeciais);
     Inicializa();
     glutMainLoop();
 }
