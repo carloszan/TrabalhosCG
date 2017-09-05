@@ -45,6 +45,14 @@ void DesenhaQuadrado(void)
     // 11 - Losango Verde
     // 12 - Losango Branco
 
+    void DesenhaTriangulo(void)
+    {
+         glBegin(GL_TRIANGLES);
+                   glVertex2f(-25.0f, -25.0f);
+                   glVertex2f(0.0f, 25.0f);
+                   glVertex2f(25.0f, -25.0f);              
+         glEnd();
+    }
 
     void Inicializa (void)
     {   

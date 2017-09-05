@@ -25,10 +25,10 @@ char texto[30];
 GLfloat win, r, g, b;
 GLint view_w, view_h, primitiva;
 int telaFacil[4][3] = {{1, 1, 2}, {2, 3, 3}, {4, 4, 5}, {5, 6, 6}};
-bool desenhadoFacil[4][3] = {{false, false, false},
-                  {false, false, false},{false, false, false},{false, false, false}};
-// bool desenhadoFacil[4][3] = {{true, true, true},
-// {true, true, true},{true, true, true},{true, true, true}};
+// bool desenhadoFacil[4][3] = {{false, false, false},
+//                   {false, false, false},{false, false, false},{false, false, false}};
+bool desenhadoFacil[4][3] = {{true, true, true},
+{true, true, true},{true, true, true},{true, true, true}};
 int x0, y0, x1, y1;
 bool  primeiroClique;
 
@@ -43,7 +43,7 @@ void DesenhaQuadrado(GLfloat x, GLfloat y)
 }
 
 // Função que desenha um triângulo
-void DesenhaTriangulo(void)
+void DesenhaTriangulo(GLfloat x, GLfloat y)
 {
      glBegin(GL_TRIANGLES);
                glVertex2f(-25.0f, -25.0f);
@@ -114,17 +114,17 @@ void DesenhaTela()
             if(telaFacil[i][j] == 4 && desenhadoFacil[i][j] == true){
                 // azul
                 glColor3f(0.0f, 0.0f, 1.0f);
-                DesenhaQuadrado(x, y);
+                DesenhaTriangulo(x, y);
             }
             if(telaFacil[i][j] == 5 && desenhadoFacil[i][j] == true){
                 // vermelho
                 glColor3f(1.0f, 0.0f, 0.0f);
-                DesenhaQuadrado(x, y);
+                DesenhaTriangulo(x, y);
             }
             if(telaFacil[i][j] == 6 && desenhadoFacil[i][j] == true){
                 // verde
                 glColor3f(0.0f, 1.0f, 0.0f);
-                DesenhaQuadrado(x, y);
+                DesenhaTriangulo(x, y);
             }    
             x += 66.7f;
         }
@@ -328,23 +328,25 @@ void MousePressionado(int x, int y)
         x0 = TransformaX(x);
         y0 = TransformaY(y);
         //DesenhaObjeto();
-        if (desenhadoFacil[MapearX(x0)][MapearY(y0)])
-            desenhadoFacil[MapearX(x0)][MapearY(y0)] = false;
+        desenhadoFacil[MapearX(x0)][MapearY(y0)] = true;
         primeiroClique = false;        
     }
     else{
         x1 = TransformaX(x);
         y1 = TransformaY(y);
 
-        DesenhaObjeto(x1, y1, MapearX(x1), MapearY(y1));
+        //DesenhaObjeto(x1, y1, MapearX(x1), MapearY(y1));
         x0 = MapearX(x0);
         y0 = MapearY(y1);
         x1 = MapearX(x1);
         y1 = MapearY(y1);
 
         sprintf(texto, "antigo: (%d, %d), novo: (%d, %d)", x0, y0, x1, y1);
-        if(telaFacil[x0][y0] == telaFacil[x1][y1]){
-            desenhadoFacil[x0][y0] = desenhadoFacil[x1][y1] = true;
+        if(!(desenhadoFacil[x0][y0] && desenhadoFacil[x1][y1])){
+            if(telaFacil[x0][y0] == telaFacil[x1][y1])
+                desenhadoFacil[x0][y0] = desenhadoFacil[x1][y1] = true;
+            else
+                desenhadoFacil[x0][y0] = false;
         }
         primeiroClique = true;
     }
