@@ -24,11 +24,11 @@
 char texto[30];
 GLfloat win, r, g, b;
 GLint view_w, view_h, primitiva;
-int telaFacil[4][3] = {{1, 1, 2}, {2, 3, 3}, {4, 4, 5}, {5, 6, 6}};
-// bool desenhadoFacil[4][3] = {{false, false, false},
-//                   {false, false, false},{false, false, false},{false, false, false}};
-bool desenhadoFacil[4][3] = {{true, true, true},
-{true, true, true},{true, true, true},{true, true, true}};
+int telaFacil[3][4] = {{1, 1, 2}, {2, 3, 3}, {4, 4, 5}, {5, 6, 6}};
+bool desenhadoFacil[3][4] = {{false, false, false},
+                  {false, false, false},{false, false, false},{false, false, false}};
+// bool desenhadoFacil[4][3] = {{true, true, true},
+// {true, true, true},{true, true, true},{true, true, true}};
 int x0, y0, x1, y1;
 bool  primeiroClique;
 
@@ -46,9 +46,9 @@ void DesenhaQuadrado(GLfloat x, GLfloat y)
 void DesenhaTriangulo(GLfloat x, GLfloat y)
 {
      glBegin(GL_TRIANGLES);
-               glVertex2f(-25.0f, -25.0f);
-               glVertex2f(0.0f, 25.0f);
-               glVertex2f(25.0f, -25.0f);              
+               glVertex2f(x, y - 50.0f);
+               glVertex2f(x + 66.7f/2, y);
+               glVertex2f(x + 66.7f, y - 50.0f);              
      glEnd();
 }
 
@@ -274,37 +274,45 @@ void Inicializa(void)
     Randomizar(4,3);
     DesenhaTela();
     CriaMenu();
+    // desenhadoFacil[0][2] = true;
+    desenhadoFacil[1][3] = true;
     
 }
 
 int TransformaX(int x)
 {
-    return x / (double) 400 * (100 - (-100)) + (-100);
+    if(x < 100)
+        return 100 - x;
+    return x - 100; 
+    //return x / (double) 400 * (100 - (-100)) + (-100);
 }
 
 int TransformaY(int y)
 {
-    return (1 - y / (double) 400) * (100 - (-100)) + (-100);
-}
-
-int MapearX(int x)
-{
-    if(x >= 33) return 2;
-    else if(x >= -33) return 1;
-    else return 0;
+    if (y < 100)
+        return 100 - y;
+    return -(y - 100);
+    // return (1 - y / (double) 400) * (100 - (-100)) + (-100);
 }
 
 int MapearY(int y)
 {
-    if(y >= 50) return 0;
-    else if(y >= 0) return 1;
-    else if(y >= -50) return 2;
+    if(y >= 33) return 2;
+    else if(y >= -33) return 1;
+    else return 0;
+}
+
+int MapearX(int x)
+{
+    if(x >= 50) return 0;
+    else if(x >= 0) return 1;
+    else if(x >= -50) return 2;
     else return 3;
 }
 
 // Função callback chamada quando o tamanho da janela é alterado 
 void AlteraTamanhoJanela(GLsizei w, GLsizei h)
-{ 
+{
     // Especifica as dimensões da Viewport
     glViewport(0, 0, w, h);
     view_w = w;
@@ -323,7 +331,8 @@ void MousePressionado(int x, int y)
     sprintf(texto, "Botao pressionado (%d,%d)", x, y);
 
     //desenhadoFacil[0][0] = true;
-    
+    printf("antigo: (%d, %d), novo: (%d, %d)\n", x, y, TransformaX(x), TransformaY(y));    
+    printf("Mapeado: (%d, %d)\n", MapearY(TransformaX(x)), MapearX(TransformaY(y))); 
     if(primeiroClique){
         x0 = TransformaX(x);
         y0 = TransformaY(y);
@@ -346,7 +355,7 @@ void MousePressionado(int x, int y)
             if(telaFacil[x0][y0] == telaFacil[x1][y1])
                 desenhadoFacil[x0][y0] = desenhadoFacil[x1][y1] = true;
             else
-                desenhadoFacil[x0][y0] = false;
+                desenhadoFacil[x1][y1] = desenhadoFacil[x0][y0] = false;
         }
         primeiroClique = true;
     }
@@ -360,7 +369,7 @@ int main(int argc, char** argv)
     srand(time(NULL));
     glutInit(&argc, argv);
     glutInitDisplayMode(GLUT_DOUBLE | GLUT_RGB);     
-    glutInitWindowSize(400,400);
+    glutInitWindowSize(200,200);
     glutInitWindowPosition(10,10);
     glutCreateWindow("Trabalho CG");
     glutDisplayFunc(Desenha);
