@@ -11,15 +11,31 @@ bool desenhadoFacil[3][4] = {{false, false, false, false},
                              {false, false, false, false}, 
                              {false, false, false, false}};
 
+int telaDificil[4][5] = {{1, 1, 2, 2, 3}, {3, 4, 4, 5, 5}, {6, 6, 7, 7, 8}, {8, 9, 9, 10, 10}};
+// bool desenhadoDificil[4][5] = {{true, true, true, true, true},
+//                                {true, true, true, true, true}, 
+//                                {true, true, true, true, true},
+//                                {true, true, true, true, true}};
+
+bool desenhadoDificil[4][5] = {{false, false, false, false, false},
+                               {false, false, false, false, false}, 
+                               {false, false, false, false, false},
+                               {false, false, false, false, false}};                        
+
 // bool desenhadoFacil[3][4] = {{true, true, true, true},
 //                              {true, true, true, true}, 
 //                              {true, true, true, true}};
-int x0, y0, x1, y1;
+int x0, yo, x1, y1;
 bool  primeiroClique;
-int i0, j0, i1, j1; 
+int i0, j0, i1, j1;
+bool memoriaFacil; 
 
-void Randomizar(int linha, int coluna)
+void Randomizar()
 {
+    int linha, coluna;
+    if(memoriaFacil){ linha = 3; coluna = 4; }
+    else {linha = 4; coluna = 5; }
+    
     srand(time(NULL));
     for(int i = 0; i < linha; i++)
     {
@@ -27,32 +43,66 @@ void Randomizar(int linha, int coluna)
         {
             int linhaParaTrocar = rand() % linha;
             int colunaParaTrocar = rand() % coluna;
-            std::swap(telaFacil[i][j], telaFacil[linhaParaTrocar][colunaParaTrocar]);
+            if(memoriaFacil)
+                std::swap(telaFacil[i][j], telaFacil[linhaParaTrocar][colunaParaTrocar]);
+            else
+                std::swap(telaDificil[i][j], telaDificil[linhaParaTrocar][colunaParaTrocar]);
         }
     }
 }
 
-void DesenhaQuadrado(GLfloat x, GLfloat y)
+void DesenhaLosango(GLfloat x, GLfloat y)
 {
     glBegin(GL_QUADS);
-        glVertex2f(x, y - 66.3f);
-        glVertex2f(x, y);
-        glVertex2f(x + 50.0f, y);
-        glVertex2f(x + 50.0f, y - 66.3f);
+        glVertex2f(x, y - 25.0f);
+        glVertex2f(x + 20.0f, y);
+        glVertex2f(x + 40.0f, y - 25.0f);
+        glVertex2f(x + 20.0f, y - 50.0f);
     glEnd();
+}
+
+void DesenhaQuadrado(GLfloat x, GLfloat y)
+{
+    if(memoriaFacil){
+        glBegin(GL_QUADS);
+            glVertex2f(x, y - 66.3f);
+            glVertex2f(x, y);
+            glVertex2f(x + 50.0f, y);
+            glVertex2f(x + 50.0f, y - 66.3f);
+        glEnd();
+    }
+    else{
+        glBegin(GL_QUADS);
+            glVertex2f(x, y - 50.0f);
+            glVertex2f(x, y);
+            glVertex2f(x + 40.0f, y);
+            glVertex2f(x + 40.0f, y - 50.0f);
+        glEnd();
+    }
 }
 
 // Função que desenha um triângulo
 void DesenhaTriangulo(GLfloat x, GLfloat y)
 {
-     glBegin(GL_TRIANGLES);
-        glVertex2f(x, y - 66.7f);
-        glVertex2f(x + 25.0f, y);
-        glVertex2f(x + 50.0f, y - 66.7f);              
-     glEnd();
+    if(memoriaFacil){
+        glBegin(GL_TRIANGLES);
+            glVertex2f(x, y - 66.7f);
+            glVertex2f(x + 25.0f, y);
+            glVertex2f(x + 50.0f, y - 66.7f);              
+        glEnd();
+    }
+    else{
+        glBegin(GL_TRIANGLES);
+            glVertex2f(x, y - 50.0f);
+            glVertex2f(x + 20.0f, y);
+            glVertex2f(x + 40.0f, y - 50.0f);              
+        glEnd();
+    }
 }
 
-void DesenhaTela()
+// a - I
+// b - J
+void DesenhaTelaFacil()
 {
     GLfloat x = -win, y = win; 
     for(int i = 0; i < 3; i++)
@@ -96,18 +146,98 @@ void DesenhaTela()
     }
 }
 
+void DesenhaTelaDificil()
+{
+    GLfloat x = -win, y = win; 
+    for(int i = 0; i < 4; i++)
+    {
+        for(int j = 0; j < 5; j++)
+        {
+            if(telaDificil[i][j] == 1 && desenhadoDificil[i][j] == true){
+                // azul
+                glColor3f(0.0f, 0.0f, 1.0f);
+                DesenhaQuadrado(x, y);
+            }
+            if(telaDificil[i][j] == 2 && desenhadoDificil[i][j] == true){
+                // vermelho
+                glColor3f(1.0f, 0.0f, 0.0f);
+                DesenhaQuadrado(x, y);
+            }
+            if(telaDificil[i][j] == 3 && desenhadoDificil[i][j] == true){
+                // verde
+                glColor3f(0.0f, 1.0f, 1.0f);
+                DesenhaQuadrado(x, y);
+            }
+            if(telaDificil[i][j] == 4 && desenhadoDificil[i][j] == true){
+                // azul
+                glColor3f(0.0f, 0.0f, 1.0f);
+                DesenhaTriangulo(x, y);
+            }
+            if(telaDificil[i][j] == 5 && desenhadoDificil[i][j] == true){
+                // vermelho
+                glColor3f(1.0f, 0.0f, 0.0f);
+                DesenhaTriangulo(x, y);
+            }
+            if(telaDificil[i][j] == 6 && desenhadoDificil[i][j] == true){
+                // verde
+                glColor3f(0.0f, 1.0f, 0.0f);
+                DesenhaTriangulo(x, y);
+            }
+            if(telaDificil[i][j] == 7 && desenhadoDificil[i][j] == true){
+                // azul
+                glColor3f(0.0f, 0.0f, 1.0f);
+                DesenhaLosango(x, y);
+            }
+            if(telaDificil[i][j] == 8 && desenhadoDificil[i][j] == true){
+                // vermelho
+                glColor3f(1.0f, 0.0f, 0.0f);
+                DesenhaLosango(x, y);
+            }
+            if(telaDificil[i][j] == 9 && desenhadoDificil[i][j] == true){
+                // verde
+                glColor3f(0.0f, 1.0f, 0.0f);
+                DesenhaLosango(x, y);
+            }
+            if(telaDificil[i][j] == 10 && desenhadoDificil[i][j] == true){
+                // cinza
+                glColor3f(0.5f, 0.5f, 0.5f);
+                DesenhaLosango(x, y);
+            }
+            x += 40.0f;
+        }
+        x = -win;
+        y -= 50.0f;
+    }
+}   
+
+
 void Desenha(void)
 {
     glMatrixMode(GL_MODELVIEW);
     glLoadIdentity();
 
     glClear(GL_COLOR_BUFFER_BIT);
-    DesenhaTela();
+    
+    if(memoriaFacil)
+        DesenhaTelaFacil();
+    else
+        DesenhaTelaDificil();
 
     glutSwapBuffers();
 }
 
-void MenuPares(int op){}
+void MenuPares(int op){
+    if(op == 0){
+        memoriaFacil = true;        
+        Randomizar();
+        Desenha();
+    }
+    else{
+        memoriaFacil = false;
+        Randomizar();
+        Desenha();
+    }
+}
 void MenuSequencia(int op){}
 void MenuPrincipal(int op)
 {
@@ -142,18 +272,20 @@ void Inicializa (void)
     win = 100.0f;
     //define a cor de background da janela
     glClearColor (1.0, 1.0, 1.0, 0.0);
-    Randomizar(3,4);
     primeiroClique = true;
+    memoriaFacil = true;
 
     Desenha();
     CriaMenu();
 
-    for(int i = 0; i < 3; i++) {
-        for(int j = 0; j < 4; j++)
-            printf("(%d)", telaFacil[i][j]);
-        printf("\n");    
-    }
+    // printar a matriz
+    // for(int i = 0; i < 3; i++) {
+    //     for(int j = 0; j < 4; j++)
+    //         printf("(%d)", telaFacil[i][j]);
+    //     printf("\n");    
+    // }
 
+    
     glMatrixMode(GL_PROJECTION);
     glLoadIdentity();
     gluOrtho2D(-win, win, -win, win);
@@ -176,18 +308,35 @@ int TransformaY(int y)
 // recebe X
 int MapearParaMatrizJ(int i)
 {
-    if(i >= 50) return 3;
-    else if (i >= 0) return 2;
-    else if(i >= -50) return 1;
-    else return 0;
+    if(memoriaFacil){
+        if(i >= 50) return 3;
+        else if (i >= 0) return 2;
+        else if(i >= -50) return 1;
+        else return 0;
+    }
+    else{
+        if(i >= 60) return 4;
+        else if (i >= 20) return 3;
+        else if(i >= -20) return 2;
+        else if(i >= -60) return 1;
+        else return 0;
+    }
 }
 
 // recebe Y
 int MapearParaMatrizI(int j)
 {
-    if(j >= 33.3) return 0;
-    else if(j >= -33.7) return 1;
-    else return 2;
+    if(memoriaFacil){
+        if(j >= 33.3) return 0;
+        else if(j >= -33.7) return 1;
+        else return 2;
+    }
+    else{
+        if(j >= 50) return 0;
+        else if(j >= 0) return 1;
+        else if(j >= -50) return 2;
+        else return 3;
+    }
 }
 
 void MousePressionado(int button, int state, int x, int y)
@@ -197,39 +346,62 @@ void MousePressionado(int button, int state, int x, int y)
     // printf("M: (%d, %d)\n", MapearParaMatrizI(TransformaY(y)), MapearParaMatrizJ(TransformaX(x)));
     if(primeiroClique){
         x0 = TransformaX(x);
-        y0 = TransformaY(y);
-        i0 = MapearParaMatrizI(y0);
+        yo = TransformaY(y);
+        i0 = MapearParaMatrizI(yo);
         j0 = MapearParaMatrizJ(x0);
         
-        if(desenhadoFacil[i0][j0])
-            return;
-        desenhadoFacil[i0][j0] = true;
-        DesenhaTela();
+        if(memoriaFacil){
+            if(desenhadoFacil[i0][j0])
+                return;
+            desenhadoFacil[i0][j0] = true;
+        }
+        else{
+            if(desenhadoDificil[i0][j0])
+                return;
+            desenhadoDificil[i0][j0] = true;
+        }
+        Desenha();
 
         primeiroClique = false;
-        printf("primeiro if");  
+        printf("esperando segunda jogada");  
     }
     else{
-        printf(" segundo if");
         x1 = TransformaX(x);
         y1 = TransformaY(y);
 
-        //DesenhaObjeto(x1, y1, MapearX(x1), MapearY(y1));
-        
         j1 = MapearParaMatrizJ(x1);
         i1 = MapearParaMatrizI(y1);
-    
-        desenhadoFacil[i1][j1] = true;
+
+        if(memoriaFacil){
+            if(desenhadoFacil[i1][j1]){
+                desenhadoFacil[i0][j0] = true;
+                Desenha();
+                return;            
+            }
+            desenhadoFacil[i1][j1] = true;
+        }
+        else{
+            if(desenhadoDificil[i1][j1]){
+                desenhadoDificil[i0][j0] = true;
+                Desenha();
+                return;            
+            }
+            desenhadoDificil[i1][j1] = true;
+        }
         Desenha();
         glFlush();
         sleep(1);
         
 
         // se os dois já não estiverem desenhados
-        if(telaFacil[i0][j0] != telaFacil[i1][j1])
-           desenhadoFacil[i0][j0] = desenhadoFacil[i1][j1] = false;
-            
-        
+        if(memoriaFacil){
+            if(telaFacil[i0][j0] != telaFacil[i1][j1])
+                desenhadoFacil[i0][j0] = desenhadoFacil[i1][j1] = false;
+        }
+        else{
+            if(telaDificil[i0][j0] != telaDificil[i1][j1])
+                desenhadoDificil[i0][j0] = desenhadoDificil[i1][j1] = false;
+        }
         primeiroClique = true;
     }
     printf("\n");

@@ -100,3 +100,9 @@ void GerenciaMouse(int button, int state, int x, int y)
          
     //glutPostRedisplay();
 }
+
+int telaFacil[4][5] = {{1, 1, 2, 2, 3}, {3, 4, 4, 5, 5}, {6, 6, 7, 7, 8}, {8, 9, 9, 10, 10}};
+bool desenhadoFacil[4][5] = {{false, false, false, false, false},
+                             {false, false, false, false, false}, 
+                             {false, false, false, false, false},
+                             {false, false, false, false, false}};
