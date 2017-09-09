@@ -35,10 +35,10 @@ void Randomizar(int linha, int coluna)
 void DesenhaQuadrado(GLfloat x, GLfloat y)
 {
     glBegin(GL_QUADS);
-        glVertex2f(x, y - 50.0f);
+        glVertex2f(x, y - 66.3f);
         glVertex2f(x, y);
-        glVertex2f(x + 66.7f, y);
-        glVertex2f(x + 66.7f, y - 50.0f);
+        glVertex2f(x + 50.0f, y);
+        glVertex2f(x + 50.0f, y - 66.3f);
     glEnd();
 }
 
@@ -46,9 +46,9 @@ void DesenhaQuadrado(GLfloat x, GLfloat y)
 void DesenhaTriangulo(GLfloat x, GLfloat y)
 {
      glBegin(GL_TRIANGLES);
-        glVertex2f(x, y - 50.0f);
-        glVertex2f(x + 66.7f/2, y);
-        glVertex2f(x + 66.7f, y - 50.0f);              
+        glVertex2f(x, y - 66.7f);
+        glVertex2f(x + 25.0f, y);
+        glVertex2f(x + 50.0f, y - 66.7f);              
      glEnd();
 }
 
