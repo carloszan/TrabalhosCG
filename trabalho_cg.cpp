@@ -220,7 +220,7 @@ void MousePressionado(int button, int state, int x, int y)
         i1 = MapearParaMatrizI(y1);
     
         desenhadoFacil[i1][j1] = true;
-        DesenhaTela();
+        Desenha();
         glFlush();
         sleep(1);
         
