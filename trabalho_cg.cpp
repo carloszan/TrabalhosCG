@@ -2,6 +2,7 @@
 #include <algorithm>
 #include <time.h>
 #include <stdio.h>
+#include <unistd.h>
 
 GLfloat win;
 
@@ -15,6 +16,7 @@ bool desenhadoFacil[3][4] = {{false, false, false, false},
 //                              {true, true, true, true}};
 int x0, y0, x1, y1;
 bool  primeiroClique;
+int i0, j0, i1, j1; 
 
 void Randomizar(int linha, int coluna)
 {
@@ -105,6 +107,36 @@ void Desenha(void)
     glutSwapBuffers();
 }
 
+void MenuPares(int op){}
+void MenuSequencia(int op){}
+void MenuPrincipal(int op)
+{
+    if(op == 0)
+        glutDestroyWindow(win);
+        exit(0);
+}
+
+void CriaMenu()
+{
+    int menu, pares, sequencia, sair;
+
+    pares = glutCreateMenu(MenuPares);
+    glutAddMenuEntry("Fácil", 0);
+    glutAddMenuEntry("Dificil", 1);
+
+    sequencia = glutCreateMenu(MenuSequencia);
+    glutAddMenuEntry("Fácil", 0);
+    glutAddMenuEntry("Díficil", 1);
+
+    menu = glutCreateMenu(MenuPrincipal);    
+    glutAddSubMenu("Formar pares", pares);
+    glutAddSubMenu("Sequencia (Genius)", sequencia);
+    glutAddMenuEntry("Sair", 0);
+    
+    glutAttachMenu(GLUT_RIGHT_BUTTON);
+    glFlush();
+}
+
 void Inicializa (void) 
 {
     win = 100.0f;
@@ -113,8 +145,14 @@ void Inicializa (void)
     Randomizar(3,4);
     primeiroClique = true;
 
-    desenhadoFacil[0][0] = true;
-    desenhadoFacil[1][0] = true;
+    Desenha();
+    CriaMenu();
+
+    for(int i = 0; i < 3; i++) {
+        for(int j = 0; j < 4; j++)
+            printf("(%d)", telaFacil[i][j]);
+        printf("\n");    
+    }
 
     glMatrixMode(GL_PROJECTION);
     glLoadIdentity();
@@ -135,7 +173,8 @@ int TransformaY(int y)
     return -(y - 100);
 }
 
-int MapearParaMatrizI(int i)
+// recebe X
+int MapearParaMatrizJ(int i)
 {
     if(i >= 50) return 3;
     else if (i >= 0) return 2;
@@ -143,55 +182,70 @@ int MapearParaMatrizI(int i)
     else return 0;
 }
 
-int MapearParaMatrizJ(int j)
+// recebe Y
+int MapearParaMatrizI(int j)
 {
     if(j >= 33.3) return 0;
     else if(j >= -33.7) return 1;
     else return 2;
 }
-void MousePressionado(int x, int y)
-{
 
-    printf("P: (%d, %d) -> (%d, %d)", x, y, TransformaX(x), TransformaY(y));
-    printf("M: (%d, %d)\n", MapearParaMatrizJ(TransformaY(y)), MapearParaMatrizI(TransformaX(x)));
+void MousePressionado(int button, int state, int x, int y)
+{   
+    if(state == GLUT_DOWN){
+    // printf("P: (%d, %d) -> (%d, %d)", x, y, TransformaX(x), TransformaY(y));
+    // printf("M: (%d, %d)\n", MapearParaMatrizI(TransformaY(y)), MapearParaMatrizJ(TransformaX(x)));
     if(primeiroClique){
         x0 = TransformaX(x);
         y0 = TransformaY(y);
-        desenhadoFacil[MapearParaMatrizI(x0)][MapearParaMatrizJ(y0)] = true;
-        primeiroClique = false;        
+        i0 = MapearParaMatrizI(y0);
+        j0 = MapearParaMatrizJ(x0);
+        
+        if(desenhadoFacil[i0][j0])
+            return;
+        desenhadoFacil[i0][j0] = true;
+        DesenhaTela();
+
+        primeiroClique = false;
+        printf("primeiro if");  
     }
-    // else{
-    //     x1 = TransformaX(x);
-    //     y1 = TransformaY(y);
+    else{
+        printf(" segundo if");
+        x1 = TransformaX(x);
+        y1 = TransformaY(y);
 
-    //     //DesenhaObjeto(x1, y1, MapearX(x1), MapearY(y1));
-    //     x0 = MapearX(x0);
-    //     y0 = MapearY(y1);
-    //     x1 = MapearX(x1);
-    //     y1 = MapearY(y1);
+        //DesenhaObjeto(x1, y1, MapearX(x1), MapearY(y1));
+        
+        j1 = MapearParaMatrizJ(x1);
+        i1 = MapearParaMatrizI(y1);
+    
+        desenhadoFacil[i1][j1] = true;
+        DesenhaTela();
+        glFlush();
+        sleep(1);
+        
 
-    //     sprintf(texto, "antigo: (%d, %d), novo: (%d, %d)", x0, y0, x1, y1);
-    //     if(!(desenhadoFacil[x0][y0] && desenhadoFacil[x1][y1])){
-    //         if(telaFacil[x0][y0] == telaFacil[x1][y1])
-    //             desenhadoFacil[x0][y0] = desenhadoFacil[x1][y1] = true;
-    //         else
-    //             desenhadoFacil[x1][y1] = desenhadoFacil[x0][y0] = false;
-    //     }
-    //     primeiroClique = true;
-    // }
-      
+        // se os dois já não estiverem desenhados
+        if(telaFacil[i0][j0] != telaFacil[i1][j1])
+           desenhadoFacil[i0][j0] = desenhadoFacil[i1][j1] = false;
+            
+        
+        primeiroClique = true;
+    }
+    printf("\n");
     glutPostRedisplay();
+    }
 }
 int main(int argc, char** argv)
 {
     glutInit(&argc, argv);
-    glutInitDisplayMode (GLUT_SINGLE | GLUT_RGB);
+    glutInitDisplayMode (GLUT_DOUBLE | GLUT_RGB);
     glutInitWindowSize (200, 200); 
     glutInitWindowPosition (100, 100);
     glutCreateWindow ("Trabalho CG");
     Inicializa();
     glutDisplayFunc(Desenha); 
-    glutMotionFunc(MousePressionado);
+    glutMouseFunc(MousePressionado);
     glutMainLoop();
     return 0;   
 }
