@@ -20,7 +20,22 @@ int telaDificil[4][5] = {{1, 1, 2, 2, 3}, {3, 4, 4, 5, 5}, {6, 6, 7, 7, 8}, {8, 
 bool desenhadoDificil[4][5] = {{false, false, false, false, false},
                                {false, false, false, false, false}, 
                                {false, false, false, false, false},
-                               {false, false, false, false, false}};                        
+                               {false, false, false, false, false}};
+                               
+int sequencia[25] = {0, 1, 2, 3, 0, 1, 2, 3, 0, 1, 2, 3, 0, 1, 2, 3, 0, 1, 2, 3, 0, 1, 2, 3, 0};
+
+
+bool desenhadoSequencia[25] = {true, false, false, false, false, 
+                                false, false, false, false, false, 
+                                false, false, false, false, false, 
+                                false, false, false, false, false, 
+                                false, false, false, false, false };
+
+// bool desenhadoSequencia[25] = {true, true, true, true, true, 
+//     true, true, true, true, true, 
+//     true, true, true, true, true, 
+//     true, true, true, true, true, 
+//     true, true, true, true, true };
 
 // bool desenhadoFacil[3][4] = {{true, true, true, true},
 //                              {true, true, true, true}, 
@@ -28,7 +43,11 @@ bool desenhadoDificil[4][5] = {{false, false, false, false, false},
 int x0, yo, x1, y1;
 bool  primeiroClique;
 int i0, j0, i1, j1;
-bool memoriaFacil; 
+bool memoriaFacil;
+bool clicandoSequencia = false;
+bool jogoSequencia = false;
+int contadorSequencia = 1;
+int contadorClique = 0;
 
 void Randomizar()
 {
@@ -49,6 +68,26 @@ void Randomizar()
                 std::swap(telaDificil[i][j], telaDificil[linhaParaTrocar][colunaParaTrocar]);
         }
     }
+}
+
+void RandomizarSequencia()
+{
+    srand(time(NULL));
+    for(int i = 0; i < 25; i++)
+    {
+        int numeroParaTrocar = rand() % 25;
+        std::swap(sequencia[i], sequencia[numeroParaTrocar]);
+    }
+}
+
+void DesenhaSequencia(GLfloat x, GLfloat y)
+{
+    glBegin(GL_QUADS);
+        glVertex2f(x, y - 100.0f);
+        glVertex2f(x, y);
+        glVertex2f(x + 100.0f, y);
+        glVertex2f(x + 100.0f, y - 100.0f);
+    glEnd();
 }
 
 void DesenhaLosango(GLfloat x, GLfloat y)
@@ -98,6 +137,40 @@ void DesenhaTriangulo(GLfloat x, GLfloat y)
             glVertex2f(x + 40.0f, y - 50.0f);              
         glEnd();
     }
+}
+
+void DesenhaTelaSequencia(int i)
+{
+    GLfloat x = -win, y = win;
+
+    if(i == 0){
+        glColor3f(1.0f, 0.0f, 0.0f);
+        DesenhaSequencia(x, y);
+    }
+    else if(i == 1){
+        glColor3f(0.0f, 1.0f, 0.0f);
+        DesenhaSequencia(x + 100, y);
+    }
+    else if(i == 2){
+        glColor3f(0.0f, 0.0f, 1.0f);
+        DesenhaSequencia(x, y - 100);
+    }
+    else if(i == 3){
+        glColor3f(0.5f, 0.5f, 0.5f);
+        DesenhaSequencia(x + 100, y - 100);
+    }
+    
+}
+
+void DesenharSequencia()
+{
+    for(int i = 0; i < contadorSequencia; i++){
+        if(desenhadoSequencia[i]){
+            DesenhaTelaSequencia(sequencia[i]);
+            
+        }
+    }
+    desenhadoSequencia[contadorSequencia] = true;
 }
 
 // a - I
@@ -218,7 +291,9 @@ void Desenha(void)
 
     glClear(GL_COLOR_BUFFER_BIT);
     
-    if(memoriaFacil)
+    if(jogoSequencia)
+        DesenharSequencia();
+    else if(memoriaFacil)
         DesenhaTelaFacil();
     else
         DesenhaTelaDificil();
@@ -227,18 +302,31 @@ void Desenha(void)
 }
 
 void MenuPares(int op){
+    jogoSequencia = false;
     if(op == 0){
-        memoriaFacil = true;        
+        memoriaFacil = true;       
         Randomizar();
+        for (int i = 0; i < 3; i++)
+            for(int j = 0; j < 4; j++)
+                desenhadoFacil[i][j] = false;
         Desenha();
     }
     else{
         memoriaFacil = false;
         Randomizar();
+        for (int i = 0; i < 4; i++)
+            for(int j = 0; j < 5; j++)
+                desenhadoDificil[i][j] = false;
         Desenha();
     }
 }
-void MenuSequencia(int op){}
+void MenuSequencia(int op){
+    jogoSequencia = true;
+    RandomizarSequencia();
+    for (int i = 0; i < 25; i++)
+        desenhadoSequencia[i] = false;
+    Desenha();
+}
 void MenuPrincipal(int op)
 {
     if(op == 0)
@@ -274,7 +362,6 @@ void Inicializa (void)
     glClearColor (1.0, 1.0, 1.0, 0.0);
     primeiroClique = true;
     memoriaFacil = true;
-
     Desenha();
     CriaMenu();
 
@@ -339,9 +426,46 @@ int MapearParaMatrizI(int j)
     }
 }
 
+int SequenciaMapear(int i, int j){
+    if(i >= 0 && j >= 0) return 1;
+    else if(i >= -100 && j >= 0) return 0;
+    else if(i >= 0 && j >= -100) return 3;
+    else if(i >= -100 && j >= -100) return 2;
+}
+
 void MousePressionado(int button, int state, int x, int y)
 {   
+    
     if(state == GLUT_DOWN){
+    if(jogoSequencia){
+        for(int i = 0; i < 25; i++)
+            printf("%d ", sequencia[i]);
+        printf("\n");
+        if(clicandoSequencia == false)
+            Desenha();
+        short clique = SequenciaMapear(TransformaX(x),TransformaY(y)); // 0..3
+        if(clique == sequencia[contadorClique]){
+            if(contadorClique == contadorSequencia){
+                printf("acertou %d", contadorSequencia);
+                Desenha();
+                contadorClique++;
+            }
+            else{
+                DesenhaTelaSequencia(clique);
+            }
+        }
+        else{
+            contadorClique = 0;
+            //RandomizarSequencia();
+            DesenharSequencia();
+            clicandoSequencia = true;
+            contadorSequencia = 1;
+            contadorClique = 1;
+            for(int i = 1; i < 25; i++)
+                desenhadoSequencia[i] = false;
+        }
+    }
+    else{
     // printf("P: (%d, %d) -> (%d, %d)", x, y, TransformaX(x), TransformaY(y));
     // printf("M: (%d, %d)\n", MapearParaMatrizI(TransformaY(y)), MapearParaMatrizJ(TransformaX(x)));
     if(primeiroClique){
@@ -403,10 +527,13 @@ void MousePressionado(int button, int state, int x, int y)
                 desenhadoDificil[i0][j0] = desenhadoDificil[i1][j1] = false;
         }
         primeiroClique = true;
+
+        Desenha();
+    
     }
     printf("\n");
     glutPostRedisplay();
-    }
+    }}
 }
 int main(int argc, char** argv)
 {
@@ -416,7 +543,7 @@ int main(int argc, char** argv)
     glutInitWindowPosition (100, 100);
     glutCreateWindow ("Trabalho CG");
     Inicializa();
-    glutDisplayFunc(Desenha); 
+    //glutDisplayFunc(Desenha); 
     glutMouseFunc(MousePressionado);
     glutMainLoop();
     return 0;   
