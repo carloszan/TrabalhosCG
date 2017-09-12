@@ -167,7 +167,6 @@ void DesenharSequencia()
     for(int i = 0; i < contadorSequencia; i++){
         if(desenhadoSequencia[i]){
             DesenhaTelaSequencia(sequencia[i]);
-            
         }
     }
     desenhadoSequencia[contadorSequencia] = true;
@@ -323,7 +322,7 @@ void MenuPares(int op){
 void MenuSequencia(int op){
     jogoSequencia = true;
     RandomizarSequencia();
-    for (int i = 0; i < 25; i++)
+    for (int i = 1; i < 25; i++)
         desenhadoSequencia[i] = false;
     Desenha();
 }
@@ -362,6 +361,7 @@ void Inicializa (void)
     glClearColor (1.0, 1.0, 1.0, 0.0);
     primeiroClique = true;
     memoriaFacil = true;
+    Randomizar();
     Desenha();
     CriaMenu();
 
@@ -454,7 +454,7 @@ void MousePressionado(int button, int state, int x, int y)
                 DesenhaTelaSequencia(clique);
             }
         }
-        else{
+        else{ // perdeu
             contadorClique = 0;
             //RandomizarSequencia();
             DesenharSequencia();
@@ -529,6 +529,31 @@ void MousePressionado(int button, int state, int x, int y)
         primeiroClique = true;
 
         Desenha();
+
+        bool ganhou = false;
+        if(memoriaFacil){
+            for(int i = 0; i < 3; i++)
+                for(int j = 0; j < 4; j++)
+                    if(desenhadoFacil[i][j] == false){
+                        ganhou = false;
+                        break;
+                    }
+                    else
+                        ganhou = true;
+                
+        }
+        else{
+            for(int i = 0; i < 4; i++)
+                for(int j = 0; j < 5; j++)
+                    if(desenhadoDificil[i][j] == false){
+                        ganhou = false;
+                        break;
+                    }
+                    else
+                        ganhou = true;            
+        }
+        if(ganhou)
+            printf("\nGANHOU\n");
     
     }
     printf("\n");
